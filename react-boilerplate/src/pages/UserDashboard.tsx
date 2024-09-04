@@ -1,9 +1,6 @@
 // src/pages/UserDashboard.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import AssetList from '../components/AssetList';
-import Notification from '../components/Notification';
 import Modal from '../components/Modal';
 import AssetForm from '../components/AssetForm';
 import AssetDetails from '../components/AssetDetails';
@@ -22,7 +19,7 @@ interface UserDashboardProps {
   setNotification: (notification: { message: string; type: 'error' | 'success' }) => void;
 }
 
-const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNotification }) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({ account, setNotification }) => {
   const [assets, setAssets] = useState<Asset[]>([
     {
       assetId: '1',
@@ -39,7 +36,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNot
       imageUrl: 'https://via.placeholder.com/150', // Dummy image URL
     },
   ]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
   useEffect(() => {
@@ -63,13 +60,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNot
     }
   };
 
-  const handleAssetSubmit = async (assetData: { assetName: string; assetType: string; assetId: string; image: File; details: Record<string, string> }) => {
+  const handleAssetSubmit = async (assetData: { assetName: string; assetType: string; image: File; details: Record<string, string> }) => {
     try {
       const formData = new FormData();
       formData.append('ownerAddress', account);
       formData.append('assetName', assetData.assetName);
       formData.append('assetType', assetData.assetType);
-      formData.append('assetId', assetData.assetId);
       formData.append('description', assetData.details.description);
       formData.append('image', assetData.image);
 
@@ -82,7 +78,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNot
       if (data.success) {
         setNotification({ message: 'Asset submitted successfully', type: 'success' });
         fetchAssets(account);
-        closeModal(); // Close modal after successful submission
+        closeAddModal(); // Close modal after successful submission
       } else {
         throw new Error(data.error);
       }
@@ -92,18 +88,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNot
     }
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
     setSelectedAsset(null); // Reset selected asset when closing modal
   };
 
   const viewAssetDetails = (asset: Asset) => {
     setSelectedAsset(asset);
-    openModal();
+    openAddModal();
   };
 
   return (
@@ -125,30 +121,25 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ account, contract, setNot
             onClick={() => viewAssetDetails(asset)}
           >
             <img src={asset.imageUrl} alt={asset.assetName} className="w-full h-32 object-cover rounded mb-4" />
-            <h3 className="text-lg font-semibold">{asset.assetName}</h3>
+            <h3 className="text-lg font-semibold text-gray-600">{asset.assetName}</h3>
             <p className="text-sm text-gray-600">{asset.assetType}</p>
             <p className="text-sm text-gray-600">{asset.description}</p>
           </div>
         ))}
       </div>
 
-      {/* Create Asset Button */}
-      <div className="text-center mt-6 grid grid-cols-2 gap-2">
+      {/* Add and Verify Asset Buttons */}
+      <div className="text-center mt-6">
         <button
-          onClick={openModal}
+          onClick={openAddModal}
           className="px-4 py-2 rounded bg-teal-600 text-white"
         >
-          Add Asset Asset
-        </button>
-        <button
-          className="px-4 py-2 rounded bg-teal-600 text-white"
-        >
-          Verify Asset
+          Add Asset
         </button>
       </div>
 
-      {/* Modal for AssetForm and Asset Details */}
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
+      {/* Modal for Adding Asset */}
+      <Modal isOpen={isAddModalOpen} onClose={closeAddModal}>
         {selectedAsset ? (
           <div>
             <AssetDetails selectedAsset={selectedAsset} />
