@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import AssetList from '../components/AssetList';
-import AssetForm from '../components/AssetForm';
-import Notification from '../components/Notification';
+import AssetList from './AssetList';
+import AssetForm from './AssetForm';
+import Notification from './Notification';
+import { div } from 'framer-motion/client';
+import UserDashboard from '../pages/UserDashboard';
 
 interface DashboardProps {
   account: string;
@@ -9,8 +11,9 @@ interface DashboardProps {
   setNotification: (notification: { message: string; type: 'error' | 'success' }) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ account, contract, setNotification }) => {
+const GetStarted: React.FC<DashboardProps> = ({ account, contract, setNotification }) => {
   const [assets, setAssets] = useState<Array<{ assetType: string; assetId: string; approvalStatus?: boolean }>>([]);
+  const [activeForm, setActiveForm] = useState<string | null>(null);
 
   useEffect(() => {
     if (account) {
@@ -68,16 +71,12 @@ const Dashboard: React.FC<DashboardProps> = ({ account, contract, setNotificatio
   };
 
   return (
-    <div className="container mx-auto mt-16">
-      <h1 className="text-3xl font-bold mb-8">Your Assets</h1>
-      <AssetList assets={assets} onMint={handleMint} />
-      <h2 className="text-2xl font-semibold mt-12">Add New Asset</h2>
-        <AssetForm assetType="Certificate" onSubmit={handleAssetSubmit} />
-      <AssetForm assetType="Product" onSubmit={handleAssetSubmit} />
-      <AssetForm assetType="Land" onSubmit={handleAssetSubmit} />
-      <AssetForm assetType="Vehicle" onSubmit={handleAssetSubmit} />
+    <div>
+      <UserDashboard account={''} contract={undefined} setNotification={function (notification: { message: string; type: 'error' | 'success'; }): void {
+        throw new Error('Function not implemented.');
+      } } />
     </div>
   );
 };
 
-export default Dashboard;
+export default GetStarted;
